@@ -4,7 +4,7 @@ services:
     env: python
     buildCommand: |
       pip install -r Config/requirements.txt
-      python manage.py migrate
+      python3 manage.py migrate
       echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password123')" | python manage.py shell
     startCommand: "gunicorn MyTasks.wsgi:application"
     envVars:
