@@ -33,8 +33,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'project-list'
 LOGOUT_REDIRECT_URL = 'login' 
 
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = ['.onrender.com']
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     
@@ -88,16 +88,16 @@ WSGI_APPLICATION = 'Config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+# }
 
 
 # Password validation
