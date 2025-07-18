@@ -3,7 +3,7 @@ services:
     name: mytasks
     env: python
     buildCommand: "pip install -r Config/requirements.txt"
-    startCommand: "python Config/manage.py migrate --noinput && gunicorn Config.wsgi:application"
+    startCommand: "python Config/manage.py migrate --noinput"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: Config.settings
