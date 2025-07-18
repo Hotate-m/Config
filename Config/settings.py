@@ -30,10 +30,11 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'project-list'
 LOGOUT_REDIRECT_URL = 'login' 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['.onrender.com']
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
+    
 SESSION_COOKIE_AGE = 300
 
 
@@ -125,6 +126,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
