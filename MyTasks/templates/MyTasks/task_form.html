@@ -1,0 +1,286 @@
+{# MyTasks/templates/MyTasks/task_form.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ form_title }}</title> {# Dynamic title from context #}
+    <style>
+        /* Global & Base Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap'); /* Added 800 weight */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0;
+            padding: 50px 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            line-height: 1.6; /* Improved readability */
+        }
+
+        /* Main Container - Enhanced glassmorphism */
+        .dashboard-container {
+            width: 100%;
+            max-width: 750px; /* Slightly wider for more spacious feel */
+            background: rgba(255,255,255,0.95); /* Even less transparent, almost opaque */
+            backdrop-filter: blur(25px); /* Increased blur for stronger effect */
+            border: 1px solid rgba(255,255,255,0.6); /* Clearer, crisp border */
+            border-radius: 25px; /* More rounded */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.02); /* Multiple shadows for depth */
+            padding: 50px 60px; /* Increased padding */
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* For any potential inner elements */
+        }
+
+        /* Subtle background pattern/overlay for container */
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.05) 0%, transparent 20%),
+                        radial-gradient(circle at 90% 90%, rgba(255,255,255,0.05) 0%, transparent 20%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Header Styles */
+        .header { text-align: center; margin-bottom: 40px; position: relative; z-index: 1; }
+        .header h1 {
+            font-size: 2.6rem; /* Adjusting size */
+            font-weight: 700;
+            color: #1a237e;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1); /* More defined text shadow */
+        }
+        .header-underline { display: block; width: 110px; height: 5px; background: linear-gradient(90deg, #42a5f5, #2979ff); margin:15px auto 0; border-radius:3px; }
+
+        /* Form Styling */
+        form {
+            margin-top: 25px; /* More space between header and form */
+            position: relative; z-index: 1; /* Ensure form elements are above overlay */
+        }
+
+        /* Style for Django's form.as_p generated paragraphs */
+        form p {
+            margin-bottom: 25px; /* Increased space between form fields for airiness */
+        }
+
+        /* Labels */
+        label {
+            display: block;
+            font-weight: 600;
+            color: #3f4a5a; /* Slightly darker grey for better readability */
+            margin-bottom: 10px; /* More space between label and input */
+            font-size: 1.05rem;
+            position: relative; /* For potential ::before/::after */
+            padding-left: 5px; /* Small indentation for style */
+        }
+        label::before { /* Subtle dot for visual interest */
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 5px;
+            background: #42a5f5;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+
+        /* Input, Textarea, Select Fields */
+        input[type="text"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 14px 18px; /* More generous padding */
+            border: 1px solid #e0e0e0; /* Very light border */
+            border-radius: 12px; /* Even more rounded corners */
+            background: #ffffff; /* Pure white background for fields */
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.05rem; /* Slightly larger text in fields */
+            color: #444; /* Darker text for readability */
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.06); /* Deeper inner shadow */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            box-sizing: border-box;
+            -webkit-appearance: none; /* For consistent select/date field styling */
+            -moz-appearance: none;
+            appearance: none; /* Remove default browser styling for select */
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px; /* Taller textarea */
+            line-height: 1.6;
+        }
+
+        /* Custom dropdown arrow for select */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666' width='18px' height='18px'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px; /* Make space for the arrow */
+            cursor: pointer;
+        }
+        /* Style for selected option within dropdown */
+        select option {
+            background-color: #ffffff;
+            color: #444;
+        }
+        /* Optional: Style for dropdown on hover/focus */
+        select:hover {
+            border-color: #a0a0a0;
+        }
+
+
+        /* Focus states for input, textarea, select */
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+            border-color: #2979ff; /* Brighter blue border on focus */
+            box-shadow: 0 0 0 4px rgba(41, 121, 255, 0.25), inset 0 3px 8px rgba(0,0,0,0.1); /* Stronger glow and inner shadow */
+            outline: none;
+            background: #fdfdff; /* Very subtle light on focus */
+        }
+
+        /* Error list styling (Django's default) */
+        .errorlist {
+            color: #d32f2f; /* Darker red for error messages */
+            font-size: 0.9em;
+            margin-top: 8px;
+            margin-bottom: 15px; /* Ensure space after errors */
+            list-style-type: none;
+            padding-left: 0;
+            font-weight: 500;
+            background: rgba(255, 235, 238, 0.8); /* Light red background */
+            border: 1px solid #ef9a9a; /* Matching border */
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+        .errorlist li {
+            margin-bottom: 5px;
+        }
+
+        /* Save Changes Button */
+        button[type="submit"] {
+            background: linear-gradient(45deg, #007bff 0%); /* New green gradient */
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 15px; /* More rounded */
+            font-size: 1.2rem;
+            font-weight: 700; /* Bolder text */
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother transition */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25); /* Larger shadow */
+            display: block;
+            margin: 40px auto 0; /* More space, centered */
+            letter-spacing: 0.8px; /* Increased letter spacing */
+            text-transform: uppercase; /* Uppercase text */
+            position: relative;
+            overflow: hidden;
+        }
+        button[type="submit"]::before { /* Hover glow effect */
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            transition: all 0.4s ease-in-out;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        button[type="submit"]:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        button[type="submit"]:hover {
+            transform: translateY(-5px); /* Stronger lift effect */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4); /* Much stronger shadow */
+            background: linear-gradient(45deg, #0056b3); /* Invert gradient on hover */
+        }
+        button[type="submit"]:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Back Link */
+        .back-link {
+            display:block;
+            text-align:center;
+            margin-top:50px; /* More space */
+            font-size:1.1rem;
+            position: relative; z-index: 1;
+        }
+        .back-link a {
+            color:#42a5f5;
+            text-decoration:none;
+            font-weight:600; /* Bolder */
+            transition:color 0.2s ease, transform 0.2s ease;
+        }
+        .back-link a:hover {
+            color:#2979ff;
+            text-decoration:underline;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Adjustments */
+        @media(max-width:768px){
+            .dashboard-container { padding: 40px; border-radius: 20px; max-width: 90%; }
+            .header h1 { font-size: 2.2rem; }
+            .header-underline { width: 90px; }
+            input[type="text"], input[type="date"], textarea, select { padding: 12px 15px; font-size: 1rem; }
+            label { font-size: 1rem; margin-bottom: 8px; }
+            form p { margin-bottom: 20px; }
+            button[type="submit"] { padding: 13px 30px; font-size: 1.1rem; margin-top: 30px; }
+            .back-link { margin-top: 35px; font-size: 1rem; }
+        }
+        @media(max-width:480px){
+            body { padding: 25px 10px; }
+            .dashboard-container { padding: 30px 25px; border-radius: 18px; }
+            .header { margin-bottom: 30px; }
+            .header h1 { font-size: 1.8rem; }
+            .header-underline { width: 70px; height: 3px; margin-top: 10px; }
+            form p { margin-bottom: 18px; }
+            input[type="text"], input[type="date"], textarea, select { padding: 10px 12px; font-size: 0.95rem; border-radius: 10px; }
+            label { font-size: 0.95rem; margin-bottom: 5px; }
+            textarea { min-height: 100px; }
+            button[type="submit"] { padding: 10px 25px; font-size: 1rem; margin-top: 25px; border-radius: 12px; }
+            .back-link { margin-top: 30px; font-size: 0.95rem; }
+            .dashboard-container::before { background: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>{{ form_title }}</h1> {# Dynamic title based on context #}
+            <span class="header-underline"></span>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button> {# Changed button text to be more generic #}
+        </form>
+        <div class="back-link">
+            {# Dynamic back link based on whether it's an edit or create form #}
+            {% if task %} {# If 'task' object exists, it's an edit form, use its project #}
+                <a href="{% url 'project-detail' pk=task.project.pk %}">Back to Project Detail</a>
+            {% elif project %} {# If 'project' object exists (from create view), use it #}
+                <a href="{% url 'project-detail' pk=project.pk %}">Back to Project Detail</a>
+            {% else %} {# Fallback if neither context variable is set (should not happen with proper views) #}
+                <a href="{% url 'project-list' %}">Back to Project List</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

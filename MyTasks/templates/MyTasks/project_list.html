@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Plan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0;
+            padding: 50px 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box; /* เพิ่ม box-sizing: border-box ให้ body */
+        }
+        .dashboard-container {
+            width: 100%;
+            max-width: 960px;
+            background: rgba(255, 255, 255, 0.7); /* Translucent background */
+            backdrop-filter: blur(20px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+            padding: 40px 50px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            margin: auto; /* เพิ่ม margin: auto; ให้ dashboard-container */
+        }
+        .dashboard-container:hover {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+        }
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative; /* เพิ่มเพื่อให้ .user-actions จัดตำแหน่งได้ง่ายขึ้น */
+            padding-top: 60px; /* เพิ่ม padding เพื่อให้มีพื้นที่สำหรับ user-actions */
+        }
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .header-underline {
+            display: block;
+            width: 120px;
+            height: 5px;
+            background: linear-gradient(90deg, #42a5f5, #2979ff);
+            margin: 15px auto 0;
+            border-radius: 3px;
+        }
+
+        /* NEW: Styles for User Actions (รวม Welcome และ Logout) */
+        .user-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .user-actions .username-display {
+            color: #1a237e;
+            font-weight: 600;
+        }
+        /* Style the form containing the logout button */
+        .user-actions form {
+            margin: 0; /* Remove default form margins */
+            padding: 0;
+            display: inline-block; /* Make the form display inline with other elements */
+        }
+        /* Style the logout button itself */
+        .user-actions button.logout-button {
+            background: linear-gradient(90deg, #ff6b6b, #ee5253); /* สีแดงสำหรับ Logout */
+            color: white;
+            padding: 8px 15px;
+            border: none; /* Remove button default border */
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(238, 82, 83, 0.2);
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif; /* Use the same font family */
+        }
+        .user-actions button.logout-button:hover {
+            background: linear-gradient(90deg, #ee5253, #d94142);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(238, 82, 83, 0.3);
+        }
+        /* END NEW User Actions */
+
+        .welcome-message {
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: #1a237e;
+            margin-bottom: 15px;
+            text-align: center;
+            white-space: nowrap;
+            display: inline-block;
+            border-right: 3px solid #1a237e;
+            animation: blink-caret .75s step-end infinite;
+            vertical-align: middle;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #1a237e; }
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: -20px;
+            margin-bottom: 30px;
+        }
+        .summary-button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .summary-button:hover {
+            background: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            gap: 25px;
+        }
+        li.project-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+        }
+        li.project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .project-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+        .project-info a {
+            text-decoration: none;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #3f51b5;
+            transition: color 0.2s ease;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            margin-bottom: 5px;
+        }
+        .project-info a:hover {
+            color: #283593;
+        }
+
+        /* Styles for Project Dates */
+        .project-dates {
+            display: flex;
+            gap: 15px;
+            font-size: 0.95rem;
+            color: #6a737d;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .project-dates strong {
+            font-weight: 600;
+            color: #4a5568;
+            margin-right: 4px;
+        }
+        .date-item {
+            display: flex;
+            align-items: center;
+        }
+
+        /* NEW: Project Completion Section Styles */
+        .project-completion {
+            width: 50%;
+            margin-top: 5px;
+        }
+        .project-completion strong {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* ENHANCED: Styles for Project Overall Progress Bar (ใช้แบบที่สวยขึ้น) */
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            border: 1: px solid rgba(255,255,255,0.4); /* Fixed: colon missing for border */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right,  #8BC34A, #4CAF50);
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+        }
+
+        .progress-bar-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 20px;
+            color: #2c3e50;
+            font-weight: 700;
+            z-index: 1;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.3), 0 0 5px rgba(0,0,0,0.05);
+        }
+        /* END NEW Project Completion Styles */
+
+        .project-status {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.5s ease-in-out;
+            flex-shrink: 0;
+        }
+        .status-to_do { background: #e74c3c; }
+        .status-in_progress { background: #f39c12; color: #333; }
+        .status-completed { background: #2ecc71; }
+        .status-on_hold { background: #95a5a6; }
+        .empty-state {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            padding: 40px;
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .welcome-message {
+                font-size: 1.8rem;
+            }
+            .user-actions { /* ปรับตำแหน่ง user-actions สำหรับ mobile */
+                position: static;
+                margin-bottom: 20px;
+                justify-content: center;
+                width: 100%;
+                order: -1; /* ให้มาอยู่บนสุดใน flex order */
+                padding-top: 0;
+            }
+            .dashboard-header {
+                padding-top: 0; /* ลบ padding ออกเมื่อเป็น mobile */
+            }
+            li.project-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .project-info {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .project-status {
+                width: 100%;
+                text-align: center;
+                margin-top: 15px;
+            }
+            .project-dates {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .welcome-message {
+                font-size: 1.5rem;
+            }
+            .project-info a {
+                font-size: 1.2rem;
+            }
+            .project-dates {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="user-actions">
+            {% if user.is_authenticated %}
+                <span class="username-display">Helllo <strong>{{ user.username }}</strong>!</span>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-button">Login</a>
+                {# <a href="{% url 'register' %}" class="register-button">Register</a> #}
+            {% endif %}
+        </div>
+
+        <div class="dashboard-header">
+            <h2 class="welcome-message"></h2>
+            <h1>Project Plan</h1>
+            <span class="header-underline"></span>
+        </div>
+
+        {# New button for Assignee Summary #}
+        <div class="button-container">
+            <a href="{% url 'assignee-summary' %}" class="summary-button">View Assignee Summary</a>
+        </div>
+
+        <ul>
+            {% for project in projects %}
+                <li class="project-card">
+                    <div class="project-info">
+                        <a href="{% url 'project-detail' project.pk %}">{{ project.project_name }}</a>
+                        {# Project Dates Container #}
+                        <div class="project-dates">
+                            <span class="date-item"><strong>Start Date:</strong> {{ project.start_date|date:"F j, Y" }}</span>
+                            <span class="date-item"><strong>Due Date:</strong> {{ project.due_date|date:"F j, Y" }}</span>
+                        </div>
+                        {# NEW: Project Completion #}
+                        <div class="project-completion">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: {{ project.completion_percentage }}%;"></div>
+                                <span class="progress-bar-text">{{ project.completion_percentage }}%</span>
+                            </div>
+                        </div>
+                        {# END NEW #}
+                    </div>
+                    <span class="project-status status-{{ project.status|lower|slugify }}">
+                        {{ project.get_status_display }}
+                    </span>
+                </li>
+            {% empty %}
+                <li class="empty-state">No projects found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {# NEW: Audio element for typing sound #}
+    {# IMPORTANT: Replace 'path/to/your/typing.mp3' with the actual path to your sound file! #}
+    <audio id="typingSound" src="path/to/your/typing.mp3" preload="auto"></audio>
+    {# END NEW #}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ดึง username จาก element ที่แสดงอยู่
+            const usernameElement = document.querySelector('.username-display strong');
+            let welcomeText = "Welcome!"; // ข้อความเริ่มต้นถ้าหา username ไม่เจอ
+
+            if (usernameElement) {
+                const username = usernameElement.textContent.trim();
+                welcomeText = `Welcome, ${username}!`; // สร้างข้อความต้อนรับพร้อมชื่อผู้ใช้
+            } else {
+                welcomeText = "Welcome Guest!"; // ถ้าไม่มี username ให้แสดง Welcome Guest
+            }
+
+
+            const welcomeTypingElement = document.querySelector('.welcome-message'); // ตัวนี้คือ h2 ที่จะพิมพ์
+            const typingSound = document.getElementById('typingSound');
+            let charIndex = 0;
+            const typingSpeed = 100;
+
+            function playTypingSound() {
+                if (typingSound) {
+                    typingSound.currentTime = 0;
+                    typingSound.play().catch(e => {
+                        // Handle potential autoplay errors (e.g., in Chrome)
+                    });
+                }
+            }
+
+            function type() {
+                if (charIndex < welcomeText.length) {
+                    playTypingSound();
+                    welcomeTypingElement.textContent += welcomeText.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(type, typingSpeed);
+                } else {
+                    welcomeTypingElement.style.borderRight = 'none';
+                    welcomeTypingElement.style.animation = 'none';
+                }
+            }
+
+            welcomeTypingElement.textContent = '';
+            setTimeout(type, 500);
+        });
+    </script>
+</body>
+</html>

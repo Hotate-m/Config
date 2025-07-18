@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ project.project_name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); margin: 0; padding: 50px 20px; color: #333; display: flex; justify-content: center; align-items: center; min-height: 10vh; } /* Reduced min-height to ensure content is visible without scrolling for small examples */
+        .dashboard-container { width: 100%; max-width: 960px; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.08); padding: 40px 50px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        h1 { font-size: 2.8rem; font-weight: 700; color: #1a237e; margin: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .header-underline { display: block; width: 120px; height: 5px; background: linear-gradient(90deg,#42a5f5,#2979ff); margin:15px auto 0; border-radius:3px; }
+        .project-details { display:grid; grid-template-columns:1fr 1fr; gap:25px; margin-bottom:40px; background:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.4); border-radius:15px; padding:25px; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+        .detail-item { display:flex; flex-direction:column; }
+        .detail-item strong { font-size:1rem; font-weight:600; color:#4a5568; margin-bottom:5px; }
+        .detail-item span { font-size:1rem; color:#6a737d; }
+        .detail-item.description { grid-column:span 2; }
+        .project-details .detail-item.description span {
+            white-space: pre-wrap;
+        }
+        .project-status { display:inline-block; width:30%; border-radius:25px; font-size:0.85rem; font-weight:600; color:#fff; text-transform:uppercase; box-shadow:0 3px 10px rgba(0,0,0,0.18); min-width:10px; text-align:center; }
+        .project-status-to_do { background:#e74c3c; }
+        .project-status-in_progress { background:#ffca28; color:#333; }
+        .project-status-completed { background:#66bb6a; }
+        .project-status-on_hold { background:#95a5a6; }
+        .progress-bar-container { width:80%; height:20px; background:#e0e0e0; border-radius:15px; overflow:hidden; position:relative; box-shadow:inset 0 2px 5px rgba(0,0,0,0.15); margin-top:5px; border:1px solid rgba(255,255,255,0.4); }
+        .progress-bar-fill { height:100%; background:linear-gradient(to right,#8BC34A,#4CAF50); border-radius:15px; text-align:center; color:#fff; transition:width 0.8s cubic-bezier(0.25,0.46,0.45,0.94); position:absolute; top:0; left:0; box-shadow:0 0 15px rgba(76,175,80,0.6); }
+        .progress-bar-text {
+            position:absolute;
+            width:100%;
+            text-align:center;
+            line-height:20px;
+            color:white; /* Changed to white for better visibility */
+            font-weight:700;
+            z-index:1;
+            text-shadow:1px 1px 2px rgba(0,0,0,0.3),0 0 5px rgba(0,0,0,0.05);
+        }
+        .tasks-section { margin-top:40px; }
+        h2 { font-size:2.2rem; font-weight:700; color:#1a237e; margin-bottom:10px; text-align:center; text-shadow:1px 1px 2px rgba(0,0,0,0.05); }
+        .tasks-header-underline { display:block; width:80px; height:4px; background:linear-gradient(90deg,#8bc34a,#4caf50); margin:0px auto 30px; border-radius:2px; }
+        ul.task-list { list-style:none; padding:0; display:grid; gap:20px; }
+        li.task-card { background:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.5); border-radius:18px; padding:25px 30px; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start; box-shadow:0 8px 20px rgba(0,0,0,0.08); transition:all 0.3s ease-in-out; position:relative; overflow:hidden; margin-bottom:20px; }
+        li.task-card:hover { transform:translateY(-8px); box-shadow:0 15px 35px rgba(0,0,0,0.15); background:rgba(255,255,255,0.9); }
+        .task-info { display:flex; flex-direction:column; flex-grow:1; width:100%; }
+        .task-info-header { display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:8px; }
+        .task-info-name { font-weight:600; color:#3f51b5; font-size:1.25rem; display:flex; align-items:center; flex-grow:1; flex-wrap:wrap; }
+        .task-info-description {
+            font-size:0.95rem;
+            color:#5a6270;
+            margin-bottom:12px;
+            line-height:1.5;
+            white-space: pre-wrap;
+        }
+        .task-info-details { font-size:0.9rem; color:#7f8c8d; display:flex; align-items:center; flex-wrap:wrap; margin-top:8px; width:100%; }
+        .task-info-details strong { font-weight:600; color:#495057; }
+        .detail-separator { margin:0 10px; color:#ced4da; }
+        .status-task { display:inline-block; padding:6px 12px; border-radius:25px; font-size:0.85rem; font-weight:600; color:#fff; text-transform:uppercase; box-shadow:0 3px 10px rgba(0,0,0,0.18); min-width:80px; text-align:center; }
+        .status-task-to_do { background:#e74c3c; }
+        .status-task-in_progress { background:#ffca28; color:#333; }
+        .status-task-completed { background:#66bb6a; }
+        .status-task-on_hold { background:#95a5a6; }
+        .empty-state { text-align:center; font-size:1.1rem; color:#7f8c8d; padding:30px; font-style:italic; }
+        li.task-card.due-soon { border:2px solid #ff7043; box-shadow:0 10px 25px rgba(255,112,67,0.25); background:rgba(255,255,255,0.9); animation:pulse-due-soon 1.5s infinite alternate; }
+        @keyframes pulse-due-soon { 0%{transform:scale(1);opacity:1;}50%{transform:scale(1.005);opacity:.98;}100%{transform:scale(1);opacity:1;} }
+        .nearing-completion-text { font-size:0.8em; color:red; margin-left:8px; font-weight:600; }
+        .due-date-nearing-completion { color:red; }
+        /* --- แก้ไข/เพิ่ม CSS สำหรับ Subtasks Container --- */
+        .subtasks-container {
+            margin-top:20px;
+            padding-left:20px;
+            border-left:3px solid #eee;
+            width:100%;
+            max-height: 0; /* ซ่อนโดยค่าเริ่มต้น */
+            opacity: 0; /* เริ่มต้นโปร่งใส */
+            overflow: hidden; /* ซ่อนเนื้อหาที่เกิน max-height */
+            transition: max-height 0.7s ease-out, opacity 0.7s ease-out; /* สร้างการเปลี่ยนผ่านที่ราบรื่น */
+        }
+        .subtasks-container.active { /* Class สำหรับสถานะที่แสดงอยู่ */
+            max-height: 1000px; /* กำหนดความสูงสูงสุดที่มากพอจะแสดงเนื้อหาทั้งหมด */
+            opacity: 1; /* แสดงผลแบบเต็ม */
+        }
+        /* --- สิ้นสุดการแก้ไข/เพิ่ม CSS --- */
+        .subtasks-container h4 { font-size:1.1rem; color:#555; margin-bottom:10px; }
+        ul.subtask-list { list-style:none; padding:0; }
+        li.subtask-item { background:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.4); border-radius:12px; padding:15px 20px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:all 0.2s ease-in-out; }
+        li.subtask-item:hover { transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.08); }
+        .subtask-info { flex-grow:1; margin-right:15px; }
+        .subtask-info-name { font-weight:500; color:#4a5568; font-size:1.1rem; margin-bottom:5px; display:flex; align-items:center; }
+        .subtask-info-description {
+            font-size:0.9rem;
+            color:#6a737d;
+            margin-bottom:8px;
+            line-height:1.4;
+            white-space: pre-wrap;
+        }
+        .subtask-info-details { font-size:0.85rem; color:#7f8c8d; }
+        .subtask-item.due-soon { border:2px solid #ff9800; background:rgba(255,255,255,0.95); }
+        .subtask-progress-container { width:80px; height:16px; background:#e0e0e0; border-radius:8px; overflow:hidden; position:relative; box-shadow:inset 0 1px 2px rgba(0,0,0,0.1); margin-left:10px; flex-shrink:0; }
+        .subtask-progress-fill { height:100%; background:linear-gradient(to right,#42a5f5,#2979ff); border-radius:8px; text-align:center; color:#fff; transition:width 0.5s ease-in-out; position:absolute; top:0; left:0; }
+        .subtask-progress-text {
+            position:absolute;
+            width:100%;
+            text-align:center;
+            line-height:16px;
+            color:white; /* Changed to white for better visibility */
+            font-size:0.75em;
+            font-weight:600;
+            z-index:1;
+        }
+        .task-header-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-left:auto; }
+        .subtask-toggle-button { background:#007bff; color:#fff; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:500; transition:background-color 0.2s ease,transform 0.1s ease; box-shadow:0 2px 5px rgba(0,0,0,0.1); flex-shrink:0; }
+        .subtask-toggle-button:hover { background:#0056b3; transform:translateY(-1px); }
+        .subtask-toggle-button:active { transform:translateY(0); }
+        .back-link { display:block; text-align:center; margin-top:30px; font-size:1.1rem; }
+        .back-link a { color:#42a5f5; text-decoration:none; font-weight:500; transition:color 0.2s ease; }
+        .back-link a:hover { color:#2979ff; text-decoration:underline; }
+
+        /* New CSS for project countdown */
+        .project-countdown-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-left: 5px; /* Added margin to separate from date */
+        }
+        .project-countdown-text.due-soon {
+            color: #e74c3c; /* Red color for nearing deadline/overdue */
+        }
+
+        /* Updated CSS for the edit button (more rounded, smaller text) */
+        .edit-icon-button {
+            margin-left: 5px; /* Reduced margin */
+            padding: 2px 6px; /* Adjusted padding for better look with smaller text */
+            border: 1px solid #dc3545; /* Red border */
+            border-radius: 12px; /* Made more rounded */
+            background-color: #dc3545; /* Red background */
+            color: #fff; /* White text color */
+            font-size: 0.7em; /* Even smaller font size */
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: inline-flex; /* Use flexbox for centering the text */
+            align-items: center; /* Center text vertically */
+            justify-content: center; /* Center text horizontally */
+            line-height: 1; /* Ensure text sits well */
+            white-space: nowrap;
+        }
+        .edit-icon-button:hover {
+            background-color: #c82333; /* Darker red on hover */
+            border-color: #bd2130;
+            transform: translateY(-0.5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .edit-icon-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Container for the New Task button to push it to the right */
+        .add-task-button-container {
+            display: flex;
+            justify-content: flex-end; /* Pushes the button to the right */
+            margin-bottom: 25px;
+            padding-right: 15px; /* Optional: adds some spacing from the right edge */
+        }
+
+        /* Styles for the "New" button, made much smaller */
+        .add-task-button-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px; /* Reduced space between icon and text */
+            background: linear-gradient(45deg, #007bff); /* Blue gradient from subtask-toggle-button */
+            color: white;
+            padding: 6px 15px; /* Significantly reduced padding */
+            border: none;
+            border-radius: 8px; /* Slightly more rounded */
+            font-size: 0.9rem; /* Reduced font size */
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
+        }
+        .add-task-button-new:hover {
+            transform: translateY(-2px); /* Smaller lift on hover */
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3); /* Adjusted shadow on hover */
+            background: linear-gradient(45deg, #0056b3); /* Invert gradient on hover */
+        }
+        .add-task-button-new .bi {
+            font-size: 1.1em; /* Adjusted icon size relative to new font size */
+        }
+
+        @media(max-width:768px){/* Responsive styles... */}
+        @media(max-width:480px){/* Responsive styles... */}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>{{ project.project_name }}</h1>
+            <span class="header-underline"></span>
+        </div>
+
+        <div class="project-details">
+            <div class="detail-item description">
+                <strong>Description</strong>
+                <span>{{ project.description }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Start Date</strong>
+                <span>{{ project.start_date }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Due Date</strong>
+                <span>
+                    {{ project.due_date }}
+                    {% if project.due_date %}
+                        <span class="project-countdown-text {% if project.is_due_soon %}due-soon{% endif %}">
+                            {% if project.days_left is not none %}
+                                {% if project.days_left > 0 %}
+                                    ({{ project.days_left }} days left)
+                                {% elif project.days_left == 0 %}
+                                    (Due Today!)
+                                {% else %}
+                                    ({{ project.overdue_days_abs }} days overdue!)
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="detail-item">
+                <strong>Status</strong>
+                <span class="project-status project-status-{{ project.status|lower|slugify }}">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <strong>Completion</strong>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {{ project.completion_percentage }}%;"></div>
+                    <span class="progress-bar-text">{{ project.completion_percentage|stringformat:"d" }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tasks-section">
+            <h2>Project Tasks</h2>
+            <span class="tasks-header-underline"></span>
+            {# Container for the Add Task button #}
+            <div class="add-task-button-container">
+                <a href="{% url 'task-create' project_pk=project.pk %}" class="add-task-button-new" title="Add New Task">
+                    New
+                </a>
+            </div>
+            <ul class="task-list">
+                {% for task in main_tasks %}
+                    {# Only show tasks that are not completed #}
+                    {% if task.status != 'completed' %}
+                        <li class="task-card {% if task.is_due_soon %}due-soon{% endif %}">
+                            <div class="task-info">
+                                <div class="task-info-header">
+                                    <div class="task-info-name">
+                                        {{ task.task_name }}
+                                        {% if task.is_due_soon %}
+                                            <span class="nearing-completion-text">Hurry up!</span>
+                                        {% endif %}
+                                        {# Display subtask progress only if there are subtasks and it's a main task #}
+                                        {% if task.subtasks_decorated|length > 0 %}
+                                            <div class="subtask-progress-container">
+                                                <div class="subtask-progress-fill" style="width: {{ task.subtask_completion_percentage }}%;"></div>
+                                                <span class="subtask-progress-text">{{ task.subtask_completion_percentage|stringformat:"d" }}%</span>
+                                            </div>
+                                        {% endif %}
+                                        {# ปุ่มแก้ไข Task #}
+                                        <a href="{% url 'task-edit' pk=task.pk %}" class="edit-icon-button" title="Edit Task">
+                                            Edit
+                                        </a>
+                                    </div>
+
+                                    <div class="task-header-actions">
+                                        {% if task.incomplete_subtask_count > 0 %} {# เปลี่ยนเงื่อนไขการแสดงปุ่ม #}
+                                            <button class="subtask-toggle-button" data-task-id="{{ task.pk }}">
+                                                Show Subtasks ({{ task.incomplete_subtask_count }}) {# เปลี่ยนการแสดงจำนวน #}
+                                            </button>
+                                        {% endif %}
+                                        <span class="status-task status-task-{{ task.status|lower|slugify }}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="task-info-description">{{ task.description }}</div>
+                                <div class="task-info-details">
+                                    Assigned to: <strong>
+                                    {% if task.assigned_to %}
+                                        {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}
+                                    {% else %}
+                                        Unassigned
+                                    {% endif %}
+                                    </strong>
+                                    <span class="detail-separator">|</span>
+                                    Due Date: <strong class="{% if task.is_due_soon %}due-date-nearing-completion{% endif %}">
+                                        {{ task.due_date|date:"F j, Y" }}
+                                        {# For tasks, we place the days left/overdue logic directly after the date #}
+                                        {% if task.due_date %}
+                                            {% if task.days_left is not None %}
+                                                {% if task.days_left > 0 %}
+                                                    ({{ task.days_left }} days left)
+                                                {% elif task.days_left == 0 %}
+                                                    (Due Today!)
+                                                {% else %} {# task.days_left < 0 #}
+                                                    ({{ task.overdue_days_abs }} days overdue!)
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            {% if task.subtasks_decorated|length > 0 %}
+                                <div class="subtasks-container" id="subtasks-{{ task.pk }}"> {# ลบ style="display:none;" ออก #}
+                                    <h4>Subtasks:</h4>
+                                    <ul class="subtask-list">
+                                        {% for subtask in task.subtasks_decorated %}
+                                            {% if subtask.status != 'completed' %}
+                                                <li class="subtask-item {% if subtask.is_due_soon %}due-soon{% endif %}">
+                                                    <div class="subtask-info">
+                                                        <div class="subtask-info-name">
+                                                            {{ subtask.task_name }}
+                                                            {# เพิ่มปุ่มแก้ไข Subtask ที่นี่ #}
+                                                            <a href="{% url 'task-edit' pk=subtask.pk %}" class="edit-icon-button" title="Edit Subtask">
+                                                                Edit
+                                                            </a>
+                                                            {% if subtask.is_due_soon %}
+                                                                <span class="nearing-completion-text">Hurry up!</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="subtask-info-description">{{ subtask.description }}</div>
+                                                        <div class="subtask-info-details">
+                                                            Assigned to: <strong>
+                                                            {% if subtask.assigned_to %}
+                                                                {{ subtask.assigned_to.first_name }} {{ subtask.assigned_to.last_name }}
+                                                            {% else %}
+                                                                Unassigned
+                                                            {% endif %}
+                                                            </strong>
+                                                            <span class="detail-separator">|</span>
+                                                            Due Date: <strong class="{% if subtask.is_due_soon %}due-date-nearing-completion{% endif %}">
+                                                            {{ subtask.due_date|date:"F j, Y" }}
+                                                            {# For subtasks, we place the days left/overdue logic directly after the date #}
+                                                            {% if subtask.due_date %}
+                                                                {% if subtask.days_left is not None %}
+                                                                    {% if subtask.days_left > 0 %}
+                                                                        ({{ subtask.days_left }} days left)
+                                                                    {% elif subtask.days_left == 0 %}
+                                                                        (Due Today!)
+                                                                    {% else %} {# subtask.days_left < 0 #}
+                                                                        ({{ subtask.overdue_days_abs }} days overdue!)
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <span class="status-task status-task-{{ subtask.status|lower|slugify }}">
+                                                        {{ subtask.get_status_display }}
+                                                    </span>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <li class="empty-state">No tasks found for this project.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'project-list' %}">Back to Project List</a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ดึง username จาก element ที่แสดงอยู่
+            const usernameElement = document.querySelector('.username-display strong');
+            let welcomeText = "Welcome!"; // ข้อความเริ่มต้นถ้าหา username ไม่เจอ
+
+            if (usernameElement) {
+                const username = usernameElement.textContent.trim();
+                welcomeText = `Welcome, ${username}!`; // สร้างข้อความต้อนรับพร้อมชื่อผู้ใช้
+            } else {
+                welcomeText = "Welcome Guest!"; // ถ้าไม่มี username ให้แสดง Welcome Guest
+            }
+
+            const welcomeTypingElement = document.querySelector('.welcome-message'); // ตัวนี้คือ h2 ที่จะพิมพ์
+            // ตรวจสอบว่า welcomeTypingElement มีอยู่จริงก่อนใช้งาน
+            if (welcomeTypingElement) {
+                const typingSound = document.getElementById('typingSound');
+                let charIndex = 0;
+                const typingSpeed = 100;
+
+                function playTypingSound() {
+                    if (typingSound) {
+                        typingSound.currentTime = 0;
+                        typingSound.play().catch(e => {
+                            // Handle potential autoplay errors (e.g., in Chrome)
+                        });
+                    }
+                }
+
+                function type() {
+                    if (charIndex < welcomeText.length) {
+                        playTypingSound();
+                        welcomeTypingElement.textContent += welcomeText.charAt(charIndex);
+                        charIndex++;
+                        setTimeout(type, typingSpeed);
+                    } else {
+                        welcomeTypingElement.style.borderRight = 'none';
+                        welcomeTypingElement.style.animation = 'none';
+                    }
+                }
+
+                welcomeTypingElement.textContent = '';
+                setTimeout(type, 500);
+            }
+
+            // โค้ดสำหรับ subtask toggle (จาก project_detail.html ที่คุณให้มา)
+            document.querySelectorAll('.subtask-toggle-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-task-id');
+                    const container = document.getElementById(`subtasks-${id}`);
+                    if (!container) return console.error('Subtasks container not found for:', id);
+
+                    const isActive = container.classList.contains('active');
+                    const currentCountText = this.textContent.match(/\(\d+\)/)?.[0] || ''; 
+
+                    if (isActive) {
+                        container.classList.remove('active');
+                        this.textContent = `Show Subtasks ${currentCountText}`;
+                    } else {
+                        container.classList.add('active');
+                        this.textContent = `Hide Subtasks ${currentCountText}`;
+                    }
+                });
+            });
+
+            // --- เพิ่มโค้ดส่วนนี้สำหรับแจ้งเตือนงานที่ได้รับมอบหมาย ---
+            const assignedTasksCount = {{ user_assigned_pending_tasks_count|default:0 }}; 
+
+            if (assignedTasksCount > 0) {
+                alert(`คุณมี ${assignedTasksCount} งานที่รอการดำเนินการ!`); // แสดงข้อความแจ้งเตือน
+            }
+            // --- สิ้นสุดการเพิ่มโค้ดส่วนนี้ ---
+        });
+    </script>
+</body>
+</html>
