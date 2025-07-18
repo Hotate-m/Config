@@ -2,7 +2,7 @@ services:
   - type: web
     name: mytasks
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install -r Config/requirements.txt"
     startCommand: "gunicorn MyTasks.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
