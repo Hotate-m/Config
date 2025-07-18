@@ -2,10 +2,12 @@ services:
   - type: web
     name: mytasks
     env: python
-    buildCommand: pip install -r Config/requirements.txt
+    buildCommand: |
+      pip install -r Config/requirements.txt
+      echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'password123')" | python Config/manage.py shell
     startCommand: |
-      python manage.py migrate --noinput
-      gunicorn MyTasks.wsgi:application
+      python Config/manage.py migrate --noinput
+      gunicorn Config.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: MyTasks.settings
+        value: Config.settings
