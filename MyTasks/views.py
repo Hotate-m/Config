@@ -230,10 +230,18 @@ class AssigneeSummaryView(LoginRequiredMixin, ListView):
     context_object_name = 'tasks_by_assignee'
 
     def get_queryset(self):
-        tasks = Task.objects.select_related('assigned_to').order_by('assigned_to__username', 'due_date')
+        # ดึง Tasks ทั้งหมด
+        tasks = Task.objects.all().select_related('assigned_to', 'project').order_by('assigned_to__username', 'due_date')
+
+        # --- เพิ่ม Logic ตรงนี้ ---
+        # ถ้าผู้ใช้ไม่ได้เป็น staff (admin) ให้กรองเฉพาะงานที่ได้รับมอบหมาย
+        if not self.request.user.is_staff:
+            tasks = tasks.filter(assigned_to=self.request.user)
+        # --- สิ้นสุด Logic ที่เพิ่ม ---
 
         tasks_by_assignee = {}
         for task in tasks:
+            # กำหนดชื่อเต็มของผู้ที่ได้รับมอบหมาย หรือ 'Unassigned'
             if task.assigned_to and task.assigned_to.first_name and task.assigned_to.last_name:
                 assignee_full_name = f"{task.assigned_to.first_name} {task.assigned_to.last_name}"
             elif task.assigned_to:
@@ -254,6 +262,7 @@ class AssigneeSummaryView(LoginRequiredMixin, ListView):
             if task.status == 'completed':
                 tasks_by_assignee[assignee_full_name]['completed_count'] += 1
 
+        # คำนวณ Level สำหรับแต่ละ Assignee
         for assignee_name, data in tasks_by_assignee.items():
             completed_tasks = data['completed_count']
             if completed_tasks < 5:

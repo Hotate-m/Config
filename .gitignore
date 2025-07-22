@@ -1,0 +1,7 @@
+db.sqlite3
+Config/__pycache__/settings.cpython-313.pyc
+Config/__pycache__/urls.cpython-313.pyc
+MyTasks/__pycache__/forms.cpython-313.pyc
+MyTasks/__pycache__/models.cpython-313.pyc
+MyTasks/__pycache__/urls.cpython-313.pyc
+MyTasks/__pycache__/views.cpython-313.pyc
